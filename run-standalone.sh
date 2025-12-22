@@ -120,4 +120,5 @@ echo ""
 echo "✅ Process completed successfully!"
 echo ""
 echo "Output saved to: $LOG_FILE"
+echo "--------------------------------------------------------------------" 
 exit 0
