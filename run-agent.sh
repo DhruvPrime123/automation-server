@@ -212,12 +212,16 @@ else
     echo "Running as current user: $TEMP_USER"
 fi
 
-# Find Claude CLI path
-CLAUDE_PATH=$(which claude 2>/dev/null || echo "/root/.npm-global/bin/claude")
+Find Claude CLI path - check multiple locations                                                                                                                                      
+CLAUDE_PATH=$(which claude 2>/dev/null || \                                                                                                                                            
+find /home -name "claude" -path "*/bin/claude" -executable 2>/dev/null | head -1 || \                                                                                              
+echo "/home/ubuntu/.nvm/versions/node/v24.12.0/bin/claude") 
 if [ ! -x "$CLAUDE_PATH" ]; then
     echo "ERROR: Claude CLI not found at $CLAUDE_PATH"
+    echo "Searched in PATH and /home/*/bin directories"
     exit 1
 fi
+echo "Found Claude CLI at: $CLAUDE_PATH" 
 
 # Change to repo directory
 cd "$REPO_DIR"
