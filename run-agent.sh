@@ -198,13 +198,31 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         chmod 440 "/etc/sudoers.d/$TEMP_USER"
     fi
 
-    # Copy Claude authentication to temp user (from /root/.claude, not .config)
-    if [ -d "/root/.claude" ]; then
-        echo "Copying Claude auth to $TEMP_USER..."
-        cp -r /root/.claude /home/$TEMP_USER/ 2>/dev/null || true
-        cp /root/.claude.json /home/$TEMP_USER/ 2>/dev/null || true
+    # Add claude-runner to the ubuntu group so it can access files in /home/ubuntu
+    usermod -aG ubuntu "$TEMP_USER" 2>/dev/null || true
+
+    # Ensure parent directories are traversable
+    chmod o+x /home/ubuntu 2>/dev/null || true
+    chmod o+x /home/ubuntu/automation-server 2>/dev/null || true
+    chmod o+x /home/ubuntu/automation-server/repos 2>/dev/null || true
+
+    # Copy Claude authentication to temp user (check multiple locations)
+    CLAUDE_AUTH_SOURCE=""
+    if [ -d "/home/ubuntu/.claude" ]; then
+        CLAUDE_AUTH_SOURCE="/home/ubuntu"
+    elif [ -d "/root/.claude" ]; then
+        CLAUDE_AUTH_SOURCE="/root"
+    fi
+
+    if [ -n "$CLAUDE_AUTH_SOURCE" ]; then
+        echo "Copying Claude auth from $CLAUDE_AUTH_SOURCE to $TEMP_USER..."
+        mkdir -p /home/$TEMP_USER/.claude
+        cp -r "$CLAUDE_AUTH_SOURCE/.claude/." /home/$TEMP_USER/.claude/ 2>/dev/null || true
+        cp "$CLAUDE_AUTH_SOURCE/.claude.json" /home/$TEMP_USER/ 2>/dev/null || true
         chown -R "$TEMP_USER:$TEMP_USER" /home/$TEMP_USER/.claude /home/$TEMP_USER/.claude.json 2>/dev/null || true
         echo "✓ Claude authentication copied"
+    else
+        echo "⚠ No Claude authentication found to copy"
     fi
 else
     # On macOS/other systems, use current user
@@ -212,10 +230,8 @@ else
     echo "Running as current user: $TEMP_USER"
 fi
 
-# Find Claude CLI path - check multiple locations                                                                                                                                      
-CLAUDE_PATH=$(which claude 2>/dev/null || \                                                                                                                                            
-find /home -name "claude" -path "*/bin/claude" -executable 2>/dev/null | head -1 || \                                                                                              
-echo "/home/ubuntu/.nvm/versions/node/v24.12.0/bin/claude") 
+# Find Claude CLI path - check multiple locations
+CLAUDE_PATH=$(which claude 2>/dev/null || find /home -name "claude" -path "*/bin/claude" -executable 2>/dev/null | head -1 || echo "/home/ubuntu/.nvm/versions/node/v24.12.0/bin/claude") 
 if [ ! -x "$CLAUDE_PATH" ]; then
     echo "ERROR: Claude CLI not found at $CLAUDE_PATH"
     echo "Searched in PATH and /home/*/bin directories"
@@ -254,7 +270,11 @@ echo "✓ Remote origin set with authenticated URL"
 # Transfer repo ownership to temp user
 echo "Transferring ownership to $TEMP_USER..."
 chown -R "$TEMP_USER:$TEMP_USER" "$REPO_DIR" 2>/dev/null || true
-chown "$TEMP_USER:$TEMP_USER" ./run-claude.expect 2>/dev/null || true
+chown "$TEMP_USER:$TEMP_USER" "${WORK_DIR}/run-claude.expect" 2>/dev/null || true
+chmod +x "${WORK_DIR}/run-claude.expect" 2>/dev/null || true
+# Ensure the RAG file is readable
+chown "$TEMP_USER:$TEMP_USER" "$RAG_FILE" 2>/dev/null || true
+chmod 644 "$RAG_FILE" 2>/dev/null || true
 
 # Step 3: Run Claude Code as Non-Root User
 echo "==========================================="
