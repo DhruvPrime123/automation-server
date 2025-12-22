@@ -212,7 +212,7 @@ else
     echo "Running as current user: $TEMP_USER"
 fi
 
-Find Claude CLI path - check multiple locations                                                                                                                                      
+# Find Claude CLI path - check multiple locations                                                                                                                                      
 CLAUDE_PATH=$(which claude 2>/dev/null || \                                                                                                                                            
 find /home -name "claude" -path "*/bin/claude" -executable 2>/dev/null | head -1 || \                                                                                              
 echo "/home/ubuntu/.nvm/versions/node/v24.12.0/bin/claude") 
@@ -276,7 +276,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Linux/EC2: Run as non-root user with su
     su "$TEMP_USER" -c "
         export GITHUB_TOKEN='${GITHUB_TOKEN}'
-        export PATH=/root/.npm-global/bin:\$PATH
+        export PATH=$(dirname $CLAUDE_PATH):\$PATH
         cd '$REPO_DIR'
         '${WORK_DIR}/run-claude.expect' '$FULL_PROMPT' 2>&1
     " | tee "${WORK_DIR}/claude-execution.log"
