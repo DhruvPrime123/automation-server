@@ -78,14 +78,22 @@ else
     GITHUB_TOKEN=""
 fi
 
-# Export environment variables and run the shell script
+# Export environment variables
 export GITHUB_REPO
 export PROMPT="$FULL_PROMPT"
 export GITHUB_TOKEN
 
-# Run the shell script and capture output
-OUTPUT=$(bash run-agent.sh 2>&1)
-EXIT_CODE=$?
+# Check if we're on Linux and need sudo
+if [[ "$OSTYPE" == "linux-gnu"* ]] && [ "$EUID" -ne 0 ]; then
+    echo "Linux detected - running with sudo (preserving environment variables)..."
+    # Run the shell script with sudo, preserving environment variables
+    OUTPUT=$(sudo -E bash run-agent.sh 2>&1)
+    EXIT_CODE=$?
+else
+    # Run the shell script normally and capture output
+    OUTPUT=$(bash run-agent.sh 2>&1)
+    EXIT_CODE=$?
+fi
 
 echo "$OUTPUT"
 

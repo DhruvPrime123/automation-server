@@ -78,7 +78,12 @@ echo -e "\n---\n" >> "$RAG_FILE"
 
 echo "REPOSITORY STRUCTURE:" >> "$RAG_FILE"
 cd "$REPO_DIR"
-tree -L 3 -I "node_modules|.git|dist|build" >> "$RAG_FILE" || ls >> "$RAG_FILE"
+if command -v tree &>/dev/null; then
+    tree -L 3 -I "node_modules|.git|dist|build" >> "$RAG_FILE"
+else
+    echo "(tree command not available, showing basic directory listing)" >> "$RAG_FILE"
+    find . -maxdepth 3 -type d -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*" -not -path "*/build/*" | sort >> "$RAG_FILE"
+fi
 cd "$WORK_DIR"
 
 echo -e "\n---\n" >> "$RAG_FILE"
@@ -165,19 +170,32 @@ EOF
 # ROOT BYPASS SETUP - Create Non-Root User (Linux/Docker only)
 # ============================================
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Check if running with sudo/root privileges
+    if [ "$EUID" -ne 0 ]; then
+        echo "ERROR: This script must be run with sudo on Linux systems"
+        echo "Please run: sudo -E bash run-agent.sh"
+        echo "(The -E flag preserves environment variables)"
+        exit 1
+    fi
+
     TEMP_USER="claude-runner"
 
     # Create temporary user if doesn't exist
     if ! id "$TEMP_USER" &>/dev/null; then
         echo "Creating temporary user: $TEMP_USER"
-        useradd -m -s /bin/bash "$TEMP_USER" 2>/dev/null || adduser -D -s /bin/bash "$TEMP_USER" 2>/dev/null || true
+        # Try useradd first (most Linux distros), fallback to adduser with correct syntax
+        if command -v useradd &>/dev/null; then
+            useradd -m -s /bin/bash "$TEMP_USER" 2>/dev/null || true
+        elif command -v adduser &>/dev/null; then
+            adduser --disabled-password --gecos "" "$TEMP_USER" 2>/dev/null || true
+        fi
     fi
 
     # Grant sudo privileges without password
     mkdir -p /etc/sudoers.d
     if [ ! -f "/etc/sudoers.d/$TEMP_USER" ]; then
         echo "$TEMP_USER ALL=(ALL) NOPASSWD: ALL" > "/etc/sudoers.d/$TEMP_USER"
-        chmod 440 "/etc/sudoers.d/$TEMP_USER" 2>/dev/null || true
+        chmod 440 "/etc/sudoers.d/$TEMP_USER"
     fi
 
     # Copy Claude authentication to temp user (from /root/.claude, not .config)
