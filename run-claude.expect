@@ -1,0 +1,50 @@
+#!/usr/bin/expect -f
+
+set timeout 300
+set prompt [lindex $argv 0]
+
+# Spawn claude with prompt and bypass permissions flag
+spawn claude --dangerously-skip-permissions -p $prompt
+
+# Handle various interactive prompts
+expect {
+    "Dark mode" {
+        send "1\r"
+        exp_continue
+    }
+    "Light mode" {
+        send "1\r"
+        exp_continue
+    }
+    "Select login method" {
+        send "1\r"
+        exp_continue
+    }
+    "Paste code here" {
+        send_user "\n\nERROR: Claude requires login! Session expired.\n"
+        exit 1
+    }
+    "Invalid API key" {
+        send_user "\n\nERROR: Invalid API key or not logged in!\n"
+        exit 1
+    }
+    "accept" {
+        send "yes\r"
+        exp_continue
+    }
+    "Allow" {
+        send "yes\r"
+        exp_continue
+    }
+    "Would you like me to help you with one of these safer alternatives instead?" {
+        send "\r"
+        exp_continue
+    }
+    timeout {
+        send_user "\n\nERROR: Claude timed out\n"
+        exit 1
+    }
+    eof
+}
+
+wait

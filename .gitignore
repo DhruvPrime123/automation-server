@@ -1,0 +1,106 @@
+# =========================
+# MERN / Node.js .gitignore
+# =========================
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Build outputs
+dist/
+build/
+out/
+.tmp/
+.temp/
+
+# Next.js (if used)
+.next/
+
+# React (CRA)
+# build/ (already covered)
+
+# Vite
+vite.config.*.timestamp-*
+.vite/
+
+# Parcel
+.parcel-cache/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# TypeScript
+*.d.ts.map
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.swp
+*.swo
+*.swn
+.idea/
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Mac/Linux trash
+.Trashes
+.AppleDouble
+.LSOverride
+
+# Docker
+docker-data/
+*.local
+
+# Database
+*.sqlite
+*.sqlite3
+
+# Certificates / keys
+*.pem
+*.key
+*.crt
+
+# Uploads (common for Node APIs)
+uploads/
+public/uploads/
+
+# Storybook
+storybook-static/
+
+# Turbo / Nx / Monorepo
+.turbo/
+.nx/
