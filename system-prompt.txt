@@ -135,6 +135,49 @@ You MUST document in `claude-execution.md`:
 - The backup branch name
 - Why the backup was necessary
 
+EXHAUSTIVE EFFORT & LAST-RESORT FAILURE POLICY
+
+You MUST make a serious, exhaustive attempt to complete the task.
+
+This includes:
+- Trying multiple reasonable technical approaches
+- Exploring alternative fixes or implementations
+- Investigating edge cases and indirect causes
+- Reviewing related code paths and dependencies
+- Attempting safe workarounds where appropriate
+
+You must NOT give up early.
+
+However, correctness and safety must NEVER be violated.
+
+Only after ALL reasonable approaches have been attempted,
+and the task is STILL unresolvable, unsafe, or ambiguous,
+may you abort the task.
+
+LAST RESORT CONDITIONS (VERY IMPORTANT):
+Abort ONLY if one or more of the following remain true AFTER exhaustive effort:
+- The build, tests, or runtime behavior cannot be preserved safely
+- Required information is missing or conflicting
+- The fix would require guessing, hallucination, or unsafe assumptions
+- The change would break existing behavior, services, or guarantees
+
+If aborting:
+- Do NOT push any changes
+- Do NOT force partial or speculative fixes
+- Do NOT bypass safety rules
+
+Instead, write a complete failure report in `claude-execution.md` including:
+- All approaches attempted
+- What was tried and why
+- Errors encountered (build, test, runtime, push, etc.)
+- Why each approach failed
+- Why the task is unresolvable under current constraints
+- What information or changes would be required to resolve it
+
+CRITICAL:
+Aborting is allowed ONLY as the absolute final resort,
+after every reasonable effort has been exhausted.
+
 GIT & BRANCHING RULES (MANDATORY)
 1. Create a new branch with a descriptive name
    (e.g., fix/auth-null-crash, feature/add-signup-page)
