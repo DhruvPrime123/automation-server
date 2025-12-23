@@ -75,7 +75,7 @@ If ANY service, module, feature, or functionality is:
 - Made non-operational (intentionally or unintentionally)
 
 Then you MUST:
-- Clearly document it in `claude-execution.md`
+- Clearly document it in `claude-execution.log` OUTSIDE THE REPOS DIRECTORY. 
 - Explain WHY it was necessary
 - Describe the impact
 - Explain how and when it should be restored
@@ -89,7 +89,7 @@ IMPLEMENTATION DISCIPLINE
 
 If unsure about a change:
 - Leave an inline comment for human review
-- AND add details to the `Required Review` section in `claude-execution.md`
+- AND add details to the `Required Review` section in `claude-execution.log`
 
 IMPORTANT: ADDING OR MODIFYING FUNCTIONALITY
 ADDING OR MODIFYING FUNCTIONALITY
@@ -97,7 +97,7 @@ If you add or modify functionality:
 - Ensure existing behavior remains unchanged
 - Do NOT remove or alter existing usage patterns unless explicitly requested
 
-You MUST document in `claude-execution.md`:
+You MUST document in `claude-execution.log`:
 - What was added or changed
 - How to use or operate the new functionality
 - Any configuration, flags, or conditions required
@@ -106,7 +106,7 @@ You MUST document in `claude-execution.md`:
 DEPENDENCY & VERSION CHANGES
 - Do NOT add, remove, or upgrade dependencies unless explicitly required
 - If a dependency or lockfile change is unavoidable:
-  - Clearly document it in claude-execution.md
+  - Clearly document it in claude-execution.log
   - Explain why it was necessary
   - Describe potential impact and compatibility risks
 
@@ -115,7 +115,7 @@ CONFIGURATION & ENVIRONMENT SAFETY
 - Do NOT introduce new required environment variables silently
 - If configuration or env changes are unavoidable:
   - Preserve backward compatibility
-  - Clearly document usage and impact in claude-execution.md
+  - Clearly document usage and impact in claude-execution.log
 
 RUNTIME & STARTUP BEHAVIOR
 - Application startup flow must remain unchanged
@@ -130,7 +130,7 @@ If you are unsure about any change, behavior impact, or edge case, but still pro
 - Perform all work on a separate feature/fix branch
 - Ensure the backup branch remains untouched and push it to origin
 
-You MUST document in `claude-execution.md`:
+You MUST document in `claude-execution.log`:
 - That a backup branch was created
 - The backup branch name
 - Why the backup was necessary
@@ -166,7 +166,7 @@ If aborting:
 - Do NOT force partial or speculative fixes
 - Do NOT bypass safety rules
 
-Instead, write a complete failure report in `claude-execution.md` including:
+Instead, write a complete failure report in `claude-execution.log` including:
 - All approaches attempted
 - What was tried and why
 - Errors encountered (build, test, runtime, push, etc.)
@@ -200,7 +200,7 @@ If accurate completion is not possible:
 IMPORTANT: POST-EXECUTION REPORT (MANDATORY)
 
 After completing all actions, write a file named:
-claude-execution.md
+claude-execution.log
 
 This file MUST include:
 
@@ -260,7 +260,7 @@ CONSTRAINTS: EXECUTION CONSTRAINTS
 
 - Do NOT ask questions
 - Do NOT request clarification
-- Do NOT output explanations outside claude-execution.md
+- Do NOT output explanations outside claude-execution.log
 - Do NOT skip steps
 - Operate fully autonomously
 - Prioritize correctness over speed
